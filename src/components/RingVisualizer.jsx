@@ -107,8 +107,9 @@ export default function RingVisualizer({ config, stoneCount, seatCircMm }) {
     return `M${sx},${sy} A${r},${r} 0 ${largeArc} 1 ${ex},${ey}`;
   }
 
-  const bandStart = 0;
-  const bandEnd = arcSpanDeg;
+  // Convert startAngle (standard math °, 0=right) → describeArc space (0=top, i.e. +90°)
+  const bandStart = startAngle + 90;
+  const bandEnd   = startAngle + arcSpanDeg + 90;
 
   return (
     <svg
@@ -127,14 +128,17 @@ export default function RingVisualizer({ config, stoneCount, seatCircMm }) {
         </>
       ) : (
         <>
-          {/* Partial band arc (outer) */}
+          {/* Full-ring guide (dashed) */}
+          <circle cx={CX} cy={CY} r={outer} fill="#1a1505" stroke="none" />
+          <circle cx={CX} cy={CY} r={inner} fill="#0f0f0f" />
+          <circle cx={CX} cy={CY} r={(inner + outer) / 2} fill="none"
+            stroke="#C9A22718" strokeWidth={outer - inner} strokeDasharray="3 3" />
+          {/* Band arc — drawn at midpoint so stroke spans exactly inner → outer */}
           <path
-            d={describeArc(CX, CY, outer, bandStart, bandEnd)}
-            fill="none" stroke="#C9A22755" strokeWidth={outer - inner}
-            strokeLinecap="round"
+            d={describeArc(CX, CY, (inner + outer) / 2, bandStart, bandEnd)}
+            fill="none" stroke="#C9A22766" strokeWidth={outer - inner}
+            strokeLinecap="butt"
           />
-          {/* Dashed guide for empty region */}
-          <circle cx={CX} cy={CY} r={seat} fill="none" stroke="#C9A22720" strokeWidth={1} strokeDasharray="4 4" />
         </>
       )}
 
@@ -154,6 +158,18 @@ export default function RingVisualizer({ config, stoneCount, seatCircMm }) {
       {/* Inner hole */}
       <circle cx={CX} cy={CY} r={inner} fill="#0f0f0f" />
       <circle cx={CX} cy={CY} r={inner} fill="none" stroke="#C9A22733" strokeWidth={1} />
+
+      {/* Ring size label */}
+      <text x={CX} y={CY - 6} textAnchor="middle" dominantBaseline="middle"
+        fill="#C9A227" fontSize={inner * 0.52} fontWeight="700"
+        fontFamily="'IBM Plex Sans', system-ui, sans-serif" letterSpacing="-0.02em">
+        {config.ringSize}
+      </text>
+      <text x={CX} y={CY + inner * 0.3} textAnchor="middle" dominantBaseline="middle"
+        fill="#C9A22799" fontSize={inner * 0.22} fontWeight="700"
+        fontFamily="'IBM Plex Sans', system-ui, sans-serif" letterSpacing="0.08em">
+        US SIZE
+      </text>
     </svg>
   );
 }

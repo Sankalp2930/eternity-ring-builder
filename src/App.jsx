@@ -22,6 +22,7 @@ function getCaratOptions(shape) {
 export default function App() {
   const [config, setConfig] = useState({ ...DEFAULTS });
   const [theme, setTheme] = useState(() => localStorage.getItem("appTheme") || "light");
+  const [mobileTab, setMobileTab] = useState("configure");
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -80,9 +81,25 @@ export default function App() {
         </div>
       </header>
 
+      {/* Mobile tab switcher — hidden on desktop via CSS */}
+      <div className="mobile-tab-bar">
+        <button
+          className={`mobile-tab-btn${mobileTab === "configure" ? " active" : ""}`}
+          onClick={() => setMobileTab("configure")}
+        >
+          Configure
+        </button>
+        <button
+          className={`mobile-tab-btn${mobileTab === "results" ? " active" : ""}`}
+          onClick={() => setMobileTab("results")}
+        >
+          Results
+        </button>
+      </div>
+
       <main className="app-main">
         {/* ── Left column: controls ── */}
-        <section className="controls-col">
+        <section className={`controls-col${mobileTab === "configure" ? " mob-active" : ""}`}>
 
           {/* Shape */}
           <div className="control-group">
@@ -179,10 +196,10 @@ export default function App() {
         </section>
 
         {/* ── Right column: results ── */}
-        <section className="results-col">
+        <section className={`results-col${mobileTab === "results" ? " mob-active" : ""}`}>
           <RingVisualizer config={config} stoneCount={result.stoneCount} seatCircMm={seatCircMm} />
-          <StoneSizeReference perStoneCarat={config.perStoneCarat} currentShape={config.shape} />
           <ResultPanel config={config} stoneCount={result.stoneCount} totalCTW={result.totalCTW} />
+          <StoneSizeReference shape={config.shape} perStoneCarat={config.perStoneCarat} />
           <ComparisonTable config={config} />
         </section>
       </main>
