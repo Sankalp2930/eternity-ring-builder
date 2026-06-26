@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ShapePicker from "./components/ShapePicker.jsx";
 import RingVisualizer from "./components/RingVisualizer.jsx";
 import ResultPanel from "./components/ResultPanel.jsx";
 import ComparisonTable from "./components/ComparisonTable.jsx";
 import AdvancedDrawer from "./components/AdvancedDrawer.jsx";
+import StoneSizeReference from "./components/StoneSizeReference.jsx";
 import { DEFAULTS, RING_SIZE_KEYS, BAND_STYLES, FANCY_SHAPES, SHAPE_DATA } from "./data/diamondData.js";
 import { computeResult, getSeatCircumference } from "./utils/calculations.js";
 
@@ -20,6 +21,12 @@ function getCaratOptions(shape) {
 
 export default function App() {
   const [config, setConfig] = useState({ ...DEFAULTS });
+  const [theme, setTheme] = useState(() => localStorage.getItem("appTheme") || "light");
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("appTheme", theme);
+  }, [theme]);
 
   function update(field, value) {
     setConfig((prev) => {
@@ -56,11 +63,20 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div className="header-inner">
-          <span className="logo-mark">◈</span>
-          <div>
-            <h1 className="app-title">Eternity Ring Builder</h1>
-            <p className="app-subtitle">Custom Diamond CTW Calculator</p>
+          <div className="header-left">
+            <span className="logo-mark">◈</span>
+            <div>
+              <h1 className="app-title">Eternity Ring Builder</h1>
+              <p className="app-subtitle">Amipi — Custom Diamond CTW Calculator</p>
+            </div>
           </div>
+          <button
+            className="theme-toggle"
+            onClick={() => setTheme((t) => t === "light" ? "dark" : "light")}
+            aria-label="Toggle dark mode"
+          >
+            {theme === "light" ? "◐ Dark" : "○ Light"}
+          </button>
         </div>
       </header>
 
@@ -165,6 +181,7 @@ export default function App() {
         {/* ── Right column: results ── */}
         <section className="results-col">
           <RingVisualizer config={config} stoneCount={result.stoneCount} seatCircMm={seatCircMm} />
+          <StoneSizeReference perStoneCarat={config.perStoneCarat} currentShape={config.shape} />
           <ResultPanel config={config} stoneCount={result.stoneCount} totalCTW={result.totalCTW} />
           <ComparisonTable config={config} />
         </section>

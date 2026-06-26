@@ -21,7 +21,7 @@ function getRadii(seatCircMm, offsetMm) {
 }
 
 // Stone shape renderer — returns JSX for a stone centered at (0,0)
-function StoneShape({ shape, w, h, orientation }) {
+function StoneShape({ shape, w, h, orientation, stoneIndex }) {
   // w = visual width in svg units, h = visual height
   const [sw, sh] = orientation === "east-west" ? [w, h] : [h, w];
   switch (shape) {
@@ -50,10 +50,16 @@ function StoneShape({ shape, w, h, orientation }) {
     case "Marquise":
       return <ellipse cx="0" cy="0" rx={sw / 2} ry={sh / 2} />;
     case "Pear": {
-      const rx = sw / 2, ry = sh / 2;
-      return (
-        <path d={`M0,${-ry} C${rx},${-ry} ${rx},${ry*0.3} ${rx},${ry*0.5} C${rx},${ry} 0,${ry} 0,${ry} C0,${ry} ${-rx},${ry} ${-rx},${ry*0.5} C${-rx},${ry*0.3} ${-rx},${-ry} 0,${-ry} Z`} />
-      );
+      // Always draw with long axis (w) along x: tip at +x, round end at −x.
+      // North-south: rotate so tip is radial. Alternate −90°/+90° each stone so tips
+      // interlock with adjacent rounds — classic compact alternating pear setting.
+      const rx = w / 2, ry = h / 2;
+      const d = `M ${rx},0 C ${0.4*rx},${-0.7*ry} ${-0.2*rx},${-ry} ${-0.4*rx},${-ry} C ${-0.9*rx},${-ry} ${-rx},${-0.6*ry} ${-rx},0 C ${-rx},${0.6*ry} ${-0.9*rx},${ry} ${-0.4*rx},${ry} C ${-0.2*rx},${ry} ${0.4*rx},${0.7*ry} ${rx},0 Z`;
+      if (orientation === "north-south") {
+        const flip = stoneIndex % 2 === 0 ? -90 : 90;
+        return <g transform={`rotate(${flip})`}><path d={d} /></g>;
+      }
+      return <path d={d} />;
     }
     default:
       return <ellipse cx="0" cy="0" rx={sw / 2} ry={sh / 2} />;
@@ -140,6 +146,7 @@ export default function RingVisualizer({ config, stoneCount, seatCircMm }) {
             w={stoneL}
             h={stoneW}
             orientation={orientation}
+            stoneIndex={key}
           />
         </g>
       ))}

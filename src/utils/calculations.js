@@ -5,28 +5,30 @@ export function getDimensions(shape, carat) {
   const table = SHAPE_DATA[shape];
   if (!table) return [3.0];
 
-  const carats = Object.keys(table).map(Number).sort((a, b) => a - b);
+  // Parse all entries as [numericCarat, dims] pairs — avoids string-key formatting bugs
+  const entries = Object.entries(table)
+    .map(([k, v]) => [parseFloat(k), v])
+    .sort((a, b) => a[0] - b[0]);
+
+  if (entries.length === 0) return [3.0];
 
   // Clamp to table range
-  if (carat <= carats[0]) return table[carats[0].toFixed(2)] ?? table[String(carats[0])];
-  if (carat >= carats[carats.length - 1]) return table[carats[carats.length - 1].toFixed(2)] ?? table[String(carats[carats.length - 1])];
+  if (carat <= entries[0][0]) return entries[0][1];
+  if (carat >= entries[entries.length - 1][0]) return entries[entries.length - 1][1];
 
-  // Linear interpolation between surrounding entries
-  let lo = carats[0], hi = carats[1];
-  for (let i = 0; i < carats.length - 1; i++) {
-    if (carat >= carats[i] && carat <= carats[i + 1]) {
-      lo = carats[i];
-      hi = carats[i + 1];
+  // Find surrounding bracket
+  let loEntry = entries[0], hiEntry = entries[1];
+  for (let i = 0; i < entries.length - 1; i++) {
+    if (carat >= entries[i][0] && carat <= entries[i + 1][0]) {
+      loEntry = entries[i];
+      hiEntry = entries[i + 1];
       break;
     }
   }
 
-  const loKey = lo % 1 === 0 ? lo.toFixed(2) : String(lo);
-  const hiKey = hi % 1 === 0 ? hi.toFixed(2) : String(hi);
-  const dimLo = table[loKey] ?? table[String(lo)];
-  const dimHi = table[hiKey] ?? table[String(hi)];
-
-  const t = (carat - lo) / (hi - lo);
+  const t = (carat - loEntry[0]) / (hiEntry[0] - loEntry[0]);
+  const dimLo = loEntry[1];
+  const dimHi = hiEntry[1];
   return dimLo.map((v, i) => v + t * ((dimHi[i] ?? v) - v));
 }
 
