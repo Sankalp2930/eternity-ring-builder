@@ -5,17 +5,44 @@ import ResultPanel from "./components/ResultPanel.jsx";
 import ComparisonTable from "./components/ComparisonTable.jsx";
 import AdvancedDrawer from "./components/AdvancedDrawer.jsx";
 import StoneSizeReference from "./components/StoneSizeReference.jsx";
-import { DEFAULTS, RING_SIZE_KEYS, BAND_STYLES, FANCY_SHAPES, SHAPE_DATA } from "./data/diamondData.js";
-import { computeResult, getSeatCircumference } from "./utils/calculations.js";
+import { DEFAULTS, RING_SIZE_KEYS, BAND_STYLES, FANCY_SHAPES, SHAPE_DATA, SHAPE_CARAT_RANGE } from "./data/diamondData.js";
+import { computeResult, getSeatCircumference, getDimensions } from "./utils/calculations.js";
 
-const CARAT_OPTIONS = [0.05, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50, 0.60, 0.75, 1.00];
+// Every breakpoint here comes from a real AMIPI source table (see SHAPE_DATA in diamondData.js):
+// Round from the sieve-size lot chart, Ruby/Sapphire/Emerald Stone from gemsData.json's color-stone
+// tables. 0.20 / 0.30 / 0.40 / 0.50 / 0.60 / 1.00 are kept as round-number stops for the fancy diamond
+// shapes, which only have sparse quarter-carat dimension tables (no finer real data exists for those).
+const CARAT_OPTIONS = [
+  0.0025, 0.003, 0.005, 0.007, 0.0085, 0.01, 0.0125, 0.015, 0.017, 0.018, 0.02,
+  0.022, 0.025, 0.03, 0.035, 0.038, 0.04, 0.042, 0.045, 0.047, 0.05, 0.053, 0.055,
+  0.057, 0.06, 0.065, 0.07, 0.08, 0.082, 0.085, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14,
+  0.15, 0.162, 0.17, 0.1925, 0.20, 0.205, 0.21, 0.215, 0.24, 0.25, 0.26, 0.30, 0.31,
+  0.315, 0.34, 0.35, 0.38, 0.40, 0.41, 0.43, 0.47, 0.50, 0.525, 0.55, 0.60, 0.625,
+  0.66, 0.71, 0.75, 0.82, 0.91, 0.96, 1.00, 1.04,
+];
 
-// Get carat options available for a given shape
+// Format a stone's mm dimensions for the reference text shown alongside each carat option
+function formatMm(shape, carat) {
+  const dims = getDimensions(shape, carat);
+  return dims.length === 1 ? `${dims[0].toFixed(2)}mm` : `${dims[0].toFixed(2)}×${dims[1].toFixed(2)}mm`;
+}
+
+// Show just enough decimal precision to distinguish tightly-spaced sieve sizes
+// (e.g. 0.0085 vs 0.01) — trims trailing zeros but never drops below 2 decimals.
+function formatCarat(carat) {
+  let s = carat.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+  const decimals = (s.split(".")[1] ?? "").length;
+  return decimals < 2 ? carat.toFixed(2) : s;
+}
+
+// Get carat options available for a given shape. Uses the curated real-inventory range
+// (SHAPE_CARAT_RANGE) when one exists for this shape; otherwise falls back to the span of
+// the shape's own dimension table.
 function getCaratOptions(shape) {
   const table = SHAPE_DATA[shape] ?? {};
   const keys = Object.keys(table).map(Number).sort((a, b) => a - b);
-  const min = keys[0] ?? 0.05;
-  const max = keys[keys.length - 1] ?? 1.00;
+  const [tableMin, tableMax] = [keys[0] ?? 0.05, keys[keys.length - 1] ?? 1.00];
+  const [min, max] = SHAPE_CARAT_RANGE[shape] ?? [tableMin, tableMax];
   return CARAT_OPTIONS.filter((c) => c >= min && c <= max);
 }
 
@@ -81,6 +108,12 @@ export default function App() {
         </div>
       </header>
 
+      {/* Ring visualizer — shown here only ≤960px, pinned above the config/results tabs.
+          Above that width it renders inside .results-col instead (see .visualizer-desktop). */}
+      <div className="visualizer-pane">
+        <RingVisualizer config={config} stoneCount={result.stoneCount} seatCircMm={seatCircMm} />
+      </div>
+
       {/* Mobile tab switcher — hidden on desktop via CSS */}
       <div className="mobile-tab-bar">
         <button
@@ -101,26 +134,25 @@ export default function App() {
         {/* ── Left column: controls ── */}
         <section className={`controls-col${mobileTab === "configure" ? " mob-active" : ""}`}>
 
-          {/* Shape */}
-          <div className="control-group">
-            <h2 className="group-label">Diamond Shape</h2>
-            <ShapePicker value={config.shape} onChange={(v) => update("shape", v)} />
-          </div>
-
-          {/* Per-stone carat */}
-          <div className="control-group">
-            <h2 className="group-label">Per-Stone Carat</h2>
-            <div className="carat-grid">
-              {caratOptions.map((c) => (
-                <button
-                  key={c}
-                  className={`carat-btn${config.perStoneCarat === c ? " active" : ""}`}
-                  onClick={() => update("perStoneCarat", c)}
-                >
-                  {c.toFixed(2)}
-                  <span className="carat-unit">ct</span>
-                </button>
-              ))}
+          {/* Shape + Per-stone carat, side by side */}
+          <div className="control-row">
+            <div className="control-group">
+              <h2 className="group-label">Stone Shape</h2>
+              <ShapePicker value={config.shape} onChange={(v) => update("shape", v)} />
+            </div>
+            <div className="control-group">
+              <h2 className="group-label">Per-Stone Carat</h2>
+              <select
+                className="select-input"
+                value={config.perStoneCarat}
+                onChange={(e) => update("perStoneCarat", parseFloat(e.target.value))}
+              >
+                {caratOptions.map((c) => (
+                  <option key={c} value={c}>
+                    {formatCarat(c)} ct — {formatMm(config.shape, c)}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -197,7 +229,10 @@ export default function App() {
 
         {/* ── Right column: results ── */}
         <section className={`results-col${mobileTab === "results" ? " mob-active" : ""}`}>
-          <RingVisualizer config={config} stoneCount={result.stoneCount} seatCircMm={seatCircMm} />
+          {/* Hidden ≤960px — the persistent .visualizer-pane above the tabs takes over there */}
+          <div className="visualizer-desktop">
+            <RingVisualizer config={config} stoneCount={result.stoneCount} seatCircMm={seatCircMm} />
+          </div>
           <ResultPanel config={config} stoneCount={result.stoneCount} totalCTW={result.totalCTW} />
           <StoneSizeReference shape={config.shape} perStoneCarat={config.perStoneCarat} />
           <ComparisonTable config={config} />

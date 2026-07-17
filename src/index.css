@@ -152,6 +152,19 @@ body {
   background: var(--bg2);
 }
 
+/* ── Shape + carat side by side ───────────────────────────────────────────────── */
+.control-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.control-row .control-group { min-width: 0; }
+
+/* ── Ring visualizer pane ──────────────────────────────────────────────────────
+   Above 960px it lives inside .results-col (.visualizer-desktop). At or below
+   960px that copy is hidden and this persistent, always-visible pane takes over,
+   pinned above the config/results tabs so the ring stays in view while configuring. */
+.visualizer-pane { display: none; }
+.visualizer-desktop { display: block; }
+
 /* ── Section labels ──────────────────────────────────────────────────────────── */
 .group-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
@@ -174,43 +187,24 @@ body {
   font-weight: 700; text-transform: uppercase;
 }
 
-/* ── Shape Picker ────────────────────────────────────────────────────────────── */
-.shape-picker {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
-}
-.shape-btn {
-  background: var(--bg); border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm); padding: 10px 6px 8px;
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  cursor: pointer; transition: all 0.12s ease; color: var(--text-dim);
-  box-shadow: var(--shadow);
-}
-.shape-btn:hover { border-color: var(--navy-hover); color: var(--text); background: var(--bg4); }
-.shape-btn.active {
-  border-color: var(--navy); background: var(--active-bg2); color: var(--navy);
-  box-shadow: var(--shadow-navy);
-}
-.shape-icon { width: 34px; height: 34px; }
-.shape-label { font-size: 10px; font-weight: 700; letter-spacing: 0.3px; text-align: center; }
-
-/* ── Carat buttons ───────────────────────────────────────────────────────────── */
-.carat-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
-}
-.carat-btn {
-  background: var(--bg); border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm); padding: 8px 4px;
+/* ── Select dropdowns (shape, carat) ──────────────────────────────────────────── */
+.select-input {
+  width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
   font-size: 13px; font-family: var(--font-sans); font-weight: 600;
-  color: var(--text-dim); cursor: pointer; transition: all 0.12s;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  box-shadow: var(--shadow);
+  color: var(--text); cursor: pointer; box-shadow: var(--shadow);
+  transition: border-color 0.12s ease;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%),
+                     linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+  background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
 }
-.carat-btn:hover { border-color: var(--navy-hover); color: var(--text); }
-.carat-btn.active {
-  border-color: var(--navy); background: var(--active-bg2); color: var(--navy);
-  box-shadow: var(--shadow-navy);
-}
-.carat-unit { font-size: 9px; font-weight: 700; color: inherit; opacity: 0.65; letter-spacing: 0.3px; text-transform: uppercase; }
+.select-input:hover { border-color: var(--navy-hover); }
+.select-input:focus { outline: none; border-color: var(--navy); box-shadow: var(--shadow-navy); }
+.select-input optgroup { font-weight: 700; color: var(--text-dim); }
+.select-input option { font-weight: 500; color: var(--text); }
 
 /* ── Orientation toggle ──────────────────────────────────────────────────────── */
 .orient-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -434,8 +428,7 @@ body {
 }
 
 /* ── Touch targets — all interactive controls ≥ 44px ────────────────────────── */
-.carat-btn, .size-btn, .band-btn { min-height: 44px; }
-.shape-btn { min-height: 48px; }
+.size-btn, .band-btn, .select-input { min-height: 44px; }
 .orient-btn, .mode-btn, .drawer-toggle { min-height: 44px; }
 
 /* ── Mobile tab bar ──────────────────────────────────────────────────────────── */
@@ -460,12 +453,7 @@ body {
   color: #1a2638;
 }
 
-/* ── Desktop two-column: fluid controls width ────────────────────────────────── */
-.app-main {
-  grid-template-columns: clamp(300px, 38%, 460px) 1fr;
-}
-
-/* ── Tablet portrait (≤ 960px) — single column, centered ────────────────────── */
+/* ── Tablet portrait (≤ 960px) — single column, centered, visualizer pinned to top ── */
 @media (max-width: 960px) {
   .app-main {
     grid-template-columns: 1fr;
@@ -480,14 +468,30 @@ body {
   }
   .results-col { padding: 20px; }
   .result-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Visualizer moves out of .results-col into the persistent top pane */
+  .visualizer-desktop { display: none; }
+  .visualizer-pane {
+    display: flex; justify-content: center;
+    padding: 16px 20px 4px;
+    background: var(--bg2);
+  }
+  .ring-visualizer { max-width: 240px; }
 }
 
-/* ── Mobile (≤ 700px) — tab-panel layout ────────────────────────────────────── */
+/* ── Mobile (≤ 700px) — tab-panel layout, visualizer stays pinned above the tabs ── */
 @media (max-width: 700px) {
   html, body, #root, .app { height: 100%; }
   .app { overflow: hidden; }
 
-  .mobile-tab-bar { display: flex; }
+  .visualizer-pane {
+    flex-shrink: 0;
+    padding: 12px 14px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ring-visualizer { max-width: 190px; }
+
+  .mobile-tab-bar { display: flex; flex-shrink: 0; }
 
   .app-main {
     flex: 1;
@@ -519,14 +523,13 @@ body {
   .app-subtitle { display: none; }
   .logo-mark  { font-size: 1.3rem; }
 
-  .shape-picker  { grid-template-columns: repeat(3, 1fr); gap: 5px; }
-  .carat-grid    { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .control-row { gap: 8px; }
+
   .band-presets  { grid-template-columns: repeat(3, 1fr); gap: 5px; }
   .size-btn      { min-width: 36px; padding: 6px 8px; font-size: 11px; }
 
   .result-grid  { grid-template-columns: 1fr 1fr; gap: 12px 14px; }
   .result-stat.big .stat-value { font-size: 22px; }
-  .ring-visualizer { max-width: 260px; }
 
   .stone-size-ref { flex-wrap: wrap; gap: 6px 10px; }
   .size-ref-note  { margin-left: 0; }
@@ -534,12 +537,11 @@ body {
 
 /* ── Small phone (≤ 400px) ───────────────────────────────────────────────────── */
 @media (max-width: 400px) {
-  .shape-icon  { width: 28px; height: 28px; }
-  .shape-label { font-size: 9px; }
   .result-grid { grid-template-columns: 1fr; }
   .result-stat.big .stat-value { font-size: 20px; }
-  .ring-visualizer { max-width: 220px; }
-  .carat-grid  { grid-template-columns: repeat(3, 1fr); }
+  .ring-visualizer { max-width: 160px; }
+  .control-row { gap: 6px; }
+  .select-input { padding: 9px 8px; font-size: 12px; }
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────────────── */
