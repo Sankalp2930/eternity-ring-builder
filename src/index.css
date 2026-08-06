@@ -105,7 +105,7 @@ body {
   box-shadow: 0 2px 12px rgba(0,0,0,0.18);
 }
 .header-inner {
-  max-width: 1200px; margin: 0 auto;
+  max-width: 1200px; margin: 0;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
 .header-left { display: flex; align-items: center; gap: 14px; }
@@ -132,7 +132,7 @@ body {
 /* ── Main layout ─────────────────────────────────────────────────────────────── */
 .app-main {
   flex: 1;
-  max-width: 1200px; margin: 0 auto; width: 100%;
+  max-width: 1200px; margin: 0; width: 100%;
   display: grid;
   grid-template-columns: clamp(300px, 38%, 460px) 1fr;
   gap: 0;
@@ -458,7 +458,7 @@ body {
   .app-main {
     grid-template-columns: 1fr;
     max-width: 680px;
-    margin: 0 auto;
+    margin: 0;
     padding-bottom: 40px;
   }
   .controls-col {
