@@ -35,15 +35,18 @@ function formatCarat(carat) {
   return decimals < 2 ? carat.toFixed(2) : s;
 }
 
-// Get carat options available for a given shape. Uses the curated real-inventory range
-// (SHAPE_CARAT_RANGE) when one exists for this shape; otherwise falls back to the span of
-// the shape's own dimension table.
+// Get carat options available for a given shape — the shape's OWN real sieve/pointer
+// breakpoints from SHAPE_DATA (not the shared CARAT_OPTIONS stop list, which predates the
+// fancy-shape mm update and is missing some exact values, e.g. Emerald's 0.18 pointer).
+// Using the table's own keys means every selectable size is an exact sourced entry, never
+// an interpolated or rounded-off stand-in. SHAPE_CARAT_RANGE can still narrow this when set.
 function getCaratOptions(shape) {
   const table = SHAPE_DATA[shape] ?? {};
   const keys = Object.keys(table).map(Number).sort((a, b) => a - b);
-  const [tableMin, tableMax] = [keys[0] ?? 0.05, keys[keys.length - 1] ?? 1.00];
+  if (!keys.length) return CARAT_OPTIONS;
+  const [tableMin, tableMax] = [keys[0], keys[keys.length - 1]];
   const [min, max] = SHAPE_CARAT_RANGE[shape] ?? [tableMin, tableMax];
-  return CARAT_OPTIONS.filter((c) => c >= min && c <= max);
+  return keys.filter((c) => c >= min && c <= max);
 }
 
 export default function App() {

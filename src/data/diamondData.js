@@ -36,14 +36,71 @@ export const SHAPE_DATA = {
     "0.41":[4.72],   "0.47":[4.895],  "0.525":[5.12],  "0.625":[5.42],  "0.71":[5.595],
     "0.75":[5.77],   "0.82":[5.995],  "0.91":[6.145],  "0.96":[6.22],   "1.04":[6.47],
   },
-  Princess: {                         "0.10":[2.7,2.7],      "0.25":[3.5,3.5],      "0.50":[4.4,4.4],      "0.75":[5.0,5.0],      "1.00":[5.5,5.5]      },
-  Emerald:  {                                                 "0.25":[4.3,3.0],      "0.50":[5.5,4.0],      "0.75":[6.3,4.5],      "1.00":[7.0,5.0]      },
-  Oval:     {                                                 "0.25":[4.5,3.0],      "0.50":[6.0,4.0],      "0.75":[6.5,4.5],      "1.00":[7.7,5.7]      },
-  Cushion:  {                                                 "0.25":[3.8,3.8],      "0.50":[4.9,4.9],      "0.75":[5.5,5.5],      "1.00":[5.9,5.9]      },
-  Asscher:  {                                                 "0.25":[3.5,3.5],      "0.50":[4.5,4.5],      "0.75":[5.0,5.0],      "1.00":[5.5,5.5]      },
-  Radiant:  {                                                 "0.25":[4.0,3.0],      "0.50":[5.0,4.0],      "0.75":[5.8,4.5],      "1.00":[6.5,5.0]      },
-  Marquise: {                                                 "0.25":[6.0,3.0],      "0.50":[8.0,4.0],      "0.75":[9.0,4.5],      "1.00":[10.0,5.0]     },
-  Pear:     {                                                 "0.25":[5.0,3.0],      "0.50":[6.0,4.0],      "0.75":[7.0,4.7],      "1.00":[7.7,5.2]      },
+  // ─── Fancy cut shapes — sourced verbatim from AMIPI's "Fancy Seive with MM Chart" (SEIVE →
+  // LENGTH × WIDTH mm → POINTER carat weight). Keyed here by the POINTER value (the nominal
+  // carat weight for that sieve band), value = [length, width] in mm. Where the source sheet
+  // listed two rows for the same POINTER (a handful of shapes have this), the later row in
+  // the sheet is kept as the more likely correction.
+  Asscher: {
+    "0.05":[2.00,2.00], "0.10":[2.50,2.50], "0.12":[2.70,2.70], "0.15":[2.90,2.90],
+    "0.20":[3.20,3.20], "0.25":[3.50,3.50], "0.30":[3.70,3.70], "0.40":[4.00,4.00],
+    "0.50":[4.30,4.30], "0.60":[4.60,4.60], "0.75":[4.90,4.90], "0.90":[5.20,5.20],
+    "1.00":[5.50,5.50],
+  },
+  Cushion: {
+    "0.05":[2.20,2.20], "0.10":[2.70,2.70], "0.12":[2.90,2.90], "0.15":[3.10,3.10],
+    "0.20":[3.40,3.40], "0.25":[3.60,3.60], "0.30":[4.00,4.00], "0.40":[4.20,4.20],
+    "0.50":[4.60,4.60], "0.60":[5.00,5.00], "0.75":[5.30,5.30], "0.90":[5.60,5.60],
+    "1.00":[5.80,5.80],
+  },
+  Emerald: {
+    "0.05":[2.50,1.75], "0.10":[3.10,2.10], "0.12":[3.40,2.40], "0.15":[3.60,2.60],
+    "0.18":[3.80,2.80], "0.20":[4.00,2.80], "0.25":[4.10,3.00], "0.30":[4.60,3.30],
+    "0.40":[5.00,3.50], "0.50":[5.50,3.80], "0.60":[6.00,4.00], "0.75":[6.30,4.40],
+    "0.90":[6.50,4.50], "1.00":[6.80,4.80],
+  },
+  Heart: {
+    "0.05":[2.50,2.50], "0.10":[3.00,3.00], "0.12":[3.30,3.30], "0.15":[3.50,3.50],
+    "0.20":[3.80,3.80], "0.25":[4.20,4.20], "0.30":[4.50,4.50], "0.40":[4.80,4.80],
+    "0.50":[5.20,5.20], "0.60":[5.60,5.60], "0.75":[6.00,6.00], "0.90":[6.30,6.30],
+    "1.00":[6.60,6.60],
+  },
+  Marquise: {
+    "0.03":[3.00,1.50], "0.04":[3.50,1.75], "0.05":[3.70,1.85], "0.07":[4.00,2.00],
+    "0.10":[4.60,2.30], "0.12":[5.00,2.50], "0.15":[5.50,2.75], "0.20":[6.00,3.00],
+    "0.25":[6.50,3.25], "0.30":[6.80,4.30], "0.40":[7.50,3.75], "0.50":[8.00,4.00],
+    "0.60":[8.80,4.40], "0.75":[9.20,4.60], "0.90":[9.80,4.90], "1.00":[10.10,5.05],
+  },
+  Oval: {
+    "0.05":[3.00,2.10], "0.10":[3.60,2.60], "0.12":[3.80,2.70], "0.13":[4.00,2.80],
+    "0.15":[4.20,3.00], "0.20":[4.60,3.20], "0.25":[5.00,3.50], "0.30":[5.50,3.80],
+    "0.40":[6.00,4.00], "0.50":[6.50,4.50], "0.60":[6.80,4.80], "0.75":[7.20,5.00],
+    "0.90":[7.60,5.40], "1.00":[8.00,5.60],
+  },
+  Pear: {
+    "0.05":[3.10,2.00], "0.10":[4.00,2.50], "0.12":[4.20,2.80], "0.15":[4.50,3.00],
+    "0.20":[5.00,3.20], "0.25":[5.50,3.50], "0.30":[5.80,3.80], "0.40":[6.20,4.10],
+    "0.50":[6.80,4.50], "0.60":[7.40,4.80], "0.75":[7.80,5.00], "0.90":[8.20,5.30],
+    "1.00":[8.50,5.50],
+  },
+  Princess: {
+    "0.05":[2.00,2.00], "0.10":[2.50,2.50], "0.12":[2.70,2.70], "0.15":[3.00,3.00],
+    "0.20":[3.20,3.20], "0.25":[3.40,3.40], "0.30":[3.70,3.70], "0.40":[4.00,4.00],
+    "0.50":[4.30,4.30], "0.60":[4.60,4.60], "0.75":[5.00,5.00], "0.90":[5.30,5.30],
+    "1.00":[5.50,5.50],
+  },
+  Radiant: {
+    "0.05":[2.80,2.00], "0.10":[3.40,2.40], "0.12":[3.60,2.60], "0.15":[3.80,2.70],
+    "0.20":[4.20,3.00], "0.25":[4.60,3.20], "0.30":[5.00,3.50], "0.40":[5.30,3.80],
+    "0.50":[5.80,4.00], "0.60":[6.20,4.40], "0.75":[6.50,4.60], "0.90":[7.00,4.90],
+    "1.00":[7.40,5.20],
+  },
+  Trilliant: {
+    "0.05":[2.60,2.60], "0.10":[3.10,3.10], "0.12":[3.40,3.40], "0.15":[3.60,3.60],
+    "0.20":[4.00,4.00], "0.25":[4.30,4.30], "0.30":[4.60,4.60], "0.40":[5.00,5.00],
+    "0.50":[5.50,5.50], "0.60":[5.80,5.80], "0.75":[6.20,6.20], "0.90":[6.50,6.50],
+    "1.00":[6.80,6.80],
+  },
 
   // ─── Color stones (round only) — from prodweb/src/Pages/Diamond/gemsData.json ──────────
   // Ruby and sapphire share one weight-per-mm table (both corundum, same specific gravity);
@@ -69,23 +126,20 @@ export const SHAPE_DATA = {
 };
 
 // ─── Diamond cut shapes vs. color stones — kept separate so pickers can group them ──────
-export const DIAMOND_SHAPES = ["Round","Princess","Emerald","Oval","Cushion","Asscher","Radiant","Marquise","Pear"];
+export const DIAMOND_SHAPES = ["Round","Princess","Emerald","Oval","Cushion","Asscher","Radiant","Marquise","Pear","Heart","Trilliant"];
 export const COLOR_STONES = ["Ruby","Sapphire","Emerald Stone"];
 export const SHAPES = DIAMOND_SHAPES;
 
-// ─── Per-shape selectable carat range, where it differs from the dimension table's own
-// keys — sourced from prodweb/src/Pages/Diamond/gemsData.json's natural-origin price bands,
-// intersected with the dimension table's range (never widened past what we have a size
-// estimate for, only narrowed to what AMIPI's natural-cut inventory actually carries).
-// Cushion/Asscher/Radiant have no natural-only band in that source, so they fall back to
-// the dimension table's own range (still an estimate, not confirmed against real inventory).
-export const SHAPE_CARAT_RANGE = {
-  Marquise: [0.25, 0.44],
-  Pear:     [0.25, 0.44],
-  Oval:     [0.25, 0.4499],
-  Princess: [0.10, 0.44],
-  Emerald:  [0.25, 0.7399],
-};
+// ─── Per-shape selectable carat range override ─────────────────────────────────
+// Empty by default — every shape's picker spans the full carat range of its own
+// SHAPE_DATA dimension table (see getCaratOptions in App.jsx), which now covers
+// every sieve size in AMIPI's "Fancy Sieve with MM Chart" reference. Previously
+// this narrowed Marquise/Pear/Oval/Princess/Emerald to only the carat band
+// matching natural-cut inventory (gemsData.json's natural-origin price bands),
+// which hid the smaller sieve sizes below that band even though real mm data
+// exists for them — removed so the builder always offers every size the
+// reference chart has, regardless of current inventory.
+export const SHAPE_CARAT_RANGE = {};
 
 export const BAND_STYLES = [
   { key: "full",         label: "Full Eternity",         coverage: 1.00 },
